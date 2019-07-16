@@ -6,6 +6,9 @@
 Bluesky Spreadsheet Documentation
 =================================
 
+This is an experimental library for using an Excel spreadsheet to enter
+parameters and metadata for executing data acquisition with bluesky.
+
 .. toctree::
    :maxdepth: 2
 

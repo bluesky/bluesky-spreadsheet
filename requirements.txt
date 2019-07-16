@@ -2,3 +2,4 @@
 bluesky
 openpyxl
 pandas
+xlrd
