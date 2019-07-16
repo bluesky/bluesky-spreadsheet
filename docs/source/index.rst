@@ -9,6 +9,11 @@ Bluesky Spreadsheet Documentation
 This is an experimental library for using an Excel spreadsheet to enter
 parameters and metadata for executing data acquisition with bluesky.
 
+Using Excel for data and metadata entry has limitations, and given enough
+resources a proper database and GUI or web application is likely a better
+solution, but an Excel spreadsheet has proved to be a useful stepping stone for
+quickly prototyping a tool that makes users comfortable.
+
 Design requirements:
 
 * The user can add rows during execution.
