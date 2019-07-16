@@ -14,4 +14,5 @@ parameters and metadata for executing data acquisition with bluesky.
 
    installation
    usage
+   reference
    release-history
