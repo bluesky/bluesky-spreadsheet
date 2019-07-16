@@ -48,7 +48,6 @@ def test_with_state(tmp_path):
         yield from bluesky.plan_stubs.mv(motor, 2.0)
         yield from bluesky.plans.count([det], 2)
 
-
     actual_msgs = list(spreadsheet())
     expected_msgs = list(expected_plan())
 
