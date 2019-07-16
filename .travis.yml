@@ -1,6 +1,15 @@
+dist: xenial
 language: python
-python:
-  - 3.6
+matrix:
+  include:
+    - python: 3.6
+    - python: 3.7
+      env: PUBLISH_DOCS=1
+env:
+  global:
+    # Doctr deploy key for bluesky/bluesky.github.io
+    - secure: "bA4cmOCVtq6bYfFNjgj1SO75wiuZ4X3Om82nyqURvWw6RNkVbhU8VzFf4HLT3CaA5jn3tau5fyxQW5lotd6B/fGGcP4US0Gb27ZxEQuyXL4lK0fhyLrw324QiVe+1Zm7ya6fIR+tOYPQGzTBJfZ+CPeorKUdNqOiuERurknZsxCWdbSpcGCKIdwKv9KnDpp1dkrHXcHAUnXJLc+Bawo5bwbWhKAP83Bb/hGp9OUyfFppWoniXag25wsMjFikZF1vW94MRaNf8GSSOG/GmigzM3mkx09N2TAW2CQ4BYsqMIlp9HF2vYtT6sQfBvQZCCoaHh2yF0QafyVzKuMLUck44OFFbJ6BXl+pt+sVUjNOgXeJoj4YoXcBd6hBdDR1rBQQtJAnA2vfSN4FMuWdXmQyJIEwjp+/Yxvk/JGm8RDyKinA7NdendqPSihrV/cKmwUGwS6VZknUMOmUVCLZcRp3HaJBP+ySmhTe/lq9Rq16x8TcpEdIl7HeNYZO6RCeB0seQgNHeYuquXKzTLwFj8mM6y1HNnbFRh185odWdtxceOayD9pNULIeILdsJv67T3Qwzrbt1s/TAudlKNhm9cxBhCf32I94Qpe0LxNZRmzhbOuZ2J6QZg2PHXNgeXwlTvITBgSV9cDlttP42OuW6jiBPaxz/nJPv4rhbfl+y2I3Vng="
+
 cache:
   directories:
     - $HOME/.cache/pip
@@ -17,4 +26,11 @@ script:
   - coverage report -m  # Generate test coverage report.
   - codecov  # Upload the report to codecov.
   - flake8 --max-line-length=115  # Enforce code style (but relax line length limit a bit).
+  - set -e
   - make -C docs html  # Build the documentation.
+  - |
+    if [ $PUBLISH_DOCS ]; then
+      # Pubish the documentation to GitHub Pages.
+      pip install doctr
+      doctr deploy --built-docs docs/build/html --deploy-repo bluesky/bluesky.github.io bluesky-spreadsheet
+    fi
