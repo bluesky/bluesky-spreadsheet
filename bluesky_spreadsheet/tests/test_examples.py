@@ -19,7 +19,7 @@ def test_instantiation(tmp_path):
     ExcelSpreadsheet(filepath, plan, [])
 
 
-def test_with_state(tmp_path):
+def test_usage(tmp_path):
 
     filepath = Path(tmp_path, 'test.xlsx')
     df = pandas.DataFrame(
@@ -27,14 +27,9 @@ def test_with_state(tmp_path):
          'number': [1, 2, 1, 2]})
     df.to_excel(filepath)
 
-    def plan(row, state):
-        position = row.get('position', state.get('position'))
-        state['position'] = position
-        number = int(row.get('number', state.get('number')))
-        state['number'] = number
-        print('in plan', position, number)
-        yield from bluesky.plan_stubs.mv(motor, position)
-        yield from bluesky.plans.count([det], number)
+    def plan(row):
+        yield from bluesky.plan_stubs.mv(motor, row['position'])
+        yield from bluesky.plans.count([det], int(row['number']))
 
     spreadsheet = ExcelSpreadsheet(filepath, plan)
 

@@ -23,27 +23,9 @@ spreadsheet.
     import bluesky_spreadsheet
     from ophyd.sim import det, motor  # simulated hardware for this example
 
-    def plan(detectors, row, state):
-        position = row['position']
-        number = row['number']
-        yield from bluesky.plan_stubs.mv(motor, position)
-        yield from bluesky.plans.count([det], number)
-
-    spreadsheet = ExcelSpreadsheet('path/to/spreadsheet.xlsx', plan)
-
-The ``state`` parameter, is a dict that we can use to persist information
-across rows. For example, we can implement the rule that if the user leaves a
-cell blank, we should use the previous value in that column.
-
-.. code:: python
-
-    def plan(detectors, row, state):
-        position = row.get('position', state.get('position'))
-        state['position'] = position
-        number = int(row.get('number', state.get('number')))
-        state['number'] = number
-        yield from bluesky.plan_stubs.mv(motor, position)
-        yield from bluesky.plans.count([det], number)
+    def plan(detectors, row):
+        yield from bluesky.plan_stubs.mv(motor, row['position'])
+        yield from bluesky.plans.count([det], int(row['number']))
 
     spreadsheet = ExcelSpreadsheet('path/to/spreadsheet.xlsx', plan)
 
@@ -53,14 +35,24 @@ for execution:
 .. code:: python
 
    from bluesky import RunEngine
+
+   RE = RunEngine()
    RE(spreadsheet())
 
-The spreadsheet is re-read between each row. Any edits made (and saved) during
-execution will be respected. If execution is interrupted, the ``spreadsheet``
-object keeps track of where it left off and will resume from the last row that
-it did not complete. To resume from a specific row use
+
+The spreadsheet is re-read between each row. Any edits or additionals made (and
+saved) to during execution to rows that have not yet been reached will be
+respected. If execution is interrupted, the ``spreadsheet`` object keeps track
+of where it left off and will resume from the last row that it did not
+complete. To resume from a specific row use
 
 .. code:: python
 
-   from bluesky import RunEngine
    RE(spreadsheet(start_at=SOME_ROW_NUMBER))
+
+.. important::
+
+   Notice in the example above that the number of exposures ``row['numbers']``
+   is explicit converted to an integer as ``int(row['numbers'])``. Excel stores
+   all numerical data as floating point, so any values that are actually
+   expected to be integers will need to be converted.
